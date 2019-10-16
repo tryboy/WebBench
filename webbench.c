@@ -4,10 +4,16 @@
 * details.
 *
 * Simple forking WWW Server benchmark:
+* 一个在linux下使用的非常简单的网站测压工具（基准测试）
 *
 * Usage:
 *   webbench --help
 *
+* 传回状态码:
+*    0 - 执行成功
+*    1 - 基准测试失败(服务器未上线线)
+*    2 - 错误参数
+*    3 - 网络错误，失败 / 内部错误，派生失败
 * Return codes:
 *    0 - sucess
 *    1 - benchmark failed (server is not on-line)
@@ -16,20 +22,29 @@
 * 
 */ 
 
+/* 引用文件|socket ->> tcp/ip编程 */
 #include "socket.c"
+/* 头文件|unistd ->> 提供对posix系统的API访问功能,包含了需要unix系统服务的函数原型 */
 #include <unistd.h>
+/* 头文件|sys/param ->> 提供系统内置的常量(不是很清晰) */
 #include <sys/param.h>
+/* 头文件|rpc/types ->> 未知 */
 #include <rpc/types.h>
+/* GUN标准库|getopet ->> 从命令行提取参数应用于程序 */
 #include <getopt.h>
+/* 标准库|string ->> 处理字符数组 */
 #include <strings.h>
+/* 标准库|time ->> 处理时间 */
 #include <time.h>
+/* 函数标准库|signal ->> 定义程序执行时如何处理不同的信号 */
 #include <signal.h>
 
 /* values */
-volatile int timerexpired=0;
-int speed=0;
-int failed=0;
-int bytes=0;
+/* 关键字|volatile ->> 不稳定的变量，提示编译器，值随时可能发生改变 */
+volatile int timerexpired=0;        // 计时器到期标识（猜）
+int speed=0;                        // 速度（猜）
+int failed=0;                       // 运行失败标识（猜）
+int bytes=0;                        // 模式事件的执行数据量单位（猜）
 
 /* globals */
 int http10=1; /* 0 - http/0.9, 1 - http/1.0, 2 - http/1.1 */
