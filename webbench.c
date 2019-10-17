@@ -39,6 +39,7 @@
 /* 函数标准库|signal ->> 定义程序执行时如何处理不同的信号 */
 #include <signal.h>
 
+/* （未知）参数值 */
 /* values */
 /* 关键字|volatile ->> 不稳定的变量，提示编译器，值随时可能发生改变 */
 volatile int timerexpired=0;        // 计时器到期标识（猜）
@@ -46,7 +47,9 @@ int speed=0;                        // 速度（猜）
 int failed=0;                       // 运行失败标识（猜）
 int bytes=0;                        // 模式事件的执行数据量单位（猜）
 
+/* 全局变量 */
 /* globals */
+/* http协议版本参数  */
 int http10=1; /* 0 - http/0.9, 1 - http/1.0, 2 - http/1.1 */
 /* Allow: GET, HEAD, OPTIONS, TRACE */
 #define METHOD_GET 0
@@ -54,17 +57,23 @@ int http10=1; /* 0 - http/0.9, 1 - http/1.0, 2 - http/1.1 */
 #define METHOD_OPTIONS 2
 #define METHOD_TRACE 3
 #define PROGRAM_VERSION "1.5"
+/* http模式默认为get */
 int method=METHOD_GET;
 int clients=1;
 int force=0;
 int force_reload=0;
+/* daili端口默认80 */
 int proxyport=80;
+/* 代理主机 */
 char *proxyhost=NULL;
+/* 基准测试时间默认30秒 */
 int benchtime=30;
 
+/* 网络参数 */
 /* internal */
 int mypipe[2];
 char host[MAXHOSTNAMELEN];
+/* 请求头长度设置为2048 */
 #define REQUEST_SIZE 2048
 char request[REQUEST_SIZE];
 
@@ -87,16 +96,26 @@ static const struct option long_options[]=
     {NULL,0,NULL,0}
 };
 
+/* 原型定义 */
 /* prototypes */
+/**
+ * 基准测试核心
+ * host 目标主机
+ * port 目标端口
+ * request 请求内容
+ */
 static void benchcore(const char* host,const int port, const char *request);
 static int bench(void);
+/* 构建请求头 */
 static void build_request(const char *url);
 
+/* 警报处理函数 */
 static void alarm_handler(int signal)
 {
     timerexpired=1;
 }	
 
+/* 使用方法说明输出 */
 static void usage(void)
 {
     fprintf(stderr,
@@ -124,22 +143,28 @@ int main(int argc, char *argv[])
     int options_index=0;
     char *tmp=NULL;
 
+    /* 不带参数时 */
     if(argc==1)
     {
+	/* 输出使用说明 */
         usage();
+	/* 返回值 */
         return 2;
     } 
 
     while((opt=getopt_long(argc,argv,"912Vfrt:p:c:?h",long_options,&options_index))!=EOF )
     {
+	/* 循环附加参数 */
         switch(opt)
         {
+	    // 不执行
             case  0 : break;
             case 'f': force=1;break;
             case 'r': force_reload=1;break; 
             case '9': http10=0;break;
             case '1': http10=1;break;
             case '2': http10=2;break;
+	    // 输出版本号
             case 'V': printf(PROGRAM_VERSION"\n");exit(0);
             case 't': benchtime=atoi(optarg);break;	     
             case 'p': 
